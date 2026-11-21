@@ -1,34 +1,94 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useApp } from '../../contexts/AppContext';
 
 export const StudyHeatmap: React.FC = () => {
-  const { activityData } = useApp();
+  const { activityData, problems } = useApp();
 
-  // Calcular dias ativos e total
-  const activeDaysCount = activityData.filter((d) => d.count > 0).length;
-  const totalSolved = activityData.reduce((acc, d) => acc + d.count, 0);
+  // Mapear contagens reais de problemas por data
+  const computedActivity = useMemo(() => {
+    const map = new Map<string, number>();
+
+    // Inicializa com os dados de activityData (se houver histórico)
+    activityData.forEach((d) => {
+      map.set(d.date, d.count);
+    });
+
+    // Sobrepõe ou garante os problemas reais cadastrados
+    const problemsByDate = new Map<string, number>();
+    problems
+      .filter((p) => p.status === 'Resolvido' && p.dataResolucao)
+      .forEach((p) => {
+        problemsByDate.set(p.dataResolucao, (problemsByDate.get(p.dataResolucao) || 0) + 1);
+      });
+
+    // Se temos problemas cadastrados, sincronizamos com a contagem real
+    problemsByDate.forEach((count, date) => {
+      map.set(date, Math.max(map.get(date) || 0, count));
+    });
+
+    // Converter para array ordenado por data
+    const dates = Array.from(map.keys()).sort();
+    return dates.map((date) => ({
+      date,
+      count: map.get(date) || 0,
+    }));
+  }, [activityData, problems]);
+
+  // Contagem de problemas e dias ativos coerente com a base
+  const totalSolved = useMemo(() => {
+    const solvedFromProblems = problems.filter((p) => p.status === 'Resolvido').length;
+    const solvedFromActivity = computedActivity.reduce((acc, d) => acc + d.count, 0);
+    return Math.max(solvedFromProblems, solvedFromActivity);
+  }, [problems, computedActivity]);
+
+  const activeDaysCount = useMemo(() => {
+    return computedActivity.filter((d) => d.count > 0).length;
+  }, [computedActivity]);
 
   // Dividir os dados em semanas (7 dias por coluna)
-  const weeks: { date: string; count: number }[][] = [];
-  let currentWeek: { date: string; count: number }[] = [];
+  const weeks = useMemo(() => {
+    const res: { date: string; count: number }[][] = [];
+    let currentWeek: { date: string; count: number }[] = [];
 
-  activityData.forEach((day, index) => {
-    currentWeek.push(day);
-    if (currentWeek.length === 7 || index === activityData.length - 1) {
-      weeks.push(currentWeek);
-      currentWeek = [];
-    }
-  });
+    computedActivity.forEach((day, index) => {
+      currentWeek.push(day);
+      if (currentWeek.length === 7 || index === computedActivity.length - 1) {
+        res.push(currentWeek);
+        currentWeek = [];
+      }
+    });
+    return res;
+  }, [computedActivity]);
 
-  // Função para retornar a cor exata do mockup (tons de pêssego / salmão / terracota suave)
+  // Calcular meses de cabeçalho dinamicamente
+  const monthLabels = useMemo(() => {
+    const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const seenMonths = new Set<string>();
+    const labels: string[] = [];
+
+    weeks.forEach((week) => {
+      const firstDay = week[0]?.date;
+      if (firstDay) {
+        const [, m] = firstDay.split('-');
+        const mIdx = parseInt(m, 10) - 1;
+        const name = monthNames[mIdx];
+        if (name && !seenMonths.has(name)) {
+          seenMonths.add(name);
+          labels.push(name);
+        }
+      }
+    });
+
+    return labels.length > 0 ? labels : ['Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov'];
+  }, [weeks]);
+
+  // Função para retornar a cor (tons de pêssego / salmão / terracota suave)
   const getCellColor = (count: number) => {
     if (count === 0) return 'bg-slate-100/70 hover:bg-slate-200';
     if (count === 1) return 'bg-[#FAD9C8] hover:bg-[#F7C6AE]'; // Pêssego claro
     if (count === 2) return 'bg-[#EFA782] hover:bg-[#EA966D]'; // Salmão médio
     return 'bg-[#C97A52] hover:bg-[#B86B44]'; // Terracota escuro
   };
-
-  const months = ['Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov'];
 
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
@@ -48,8 +108,8 @@ export const StudyHeatmap: React.FC = () => {
       <div className="overflow-x-auto pb-2">
         <div className="min-w-[680px]">
           <div className="flex justify-between text-[11px] font-medium text-slate-400 px-2 mb-2">
-            {months.map((m) => (
-              <span key={m}>{m}</span>
+            {monthLabels.map((m, idx) => (
+              <span key={`${m}-${idx}`}>{m}</span>
             ))}
           </div>
 

@@ -30,7 +30,28 @@ export const Statistics: React.FC = () => {
   const totalSolved = problems.filter((p) => p.status === 'Resolvido').length;
   const starCount = problems.filter((p) => p.isStar).length;
   const activeDays = activityData.filter((d) => d.count > 0).length;
-  const avgPerWeek = (totalSolved / 24).toFixed(1); // Média de ~5.3 problemas/semana
+
+  // Cálculo dinâmico de semanas decorridas com base nas datas de resolução
+  const solvedDates = problems
+    .filter((p) => p.status === 'Resolvido' && p.dataResolucao)
+    .map((p) => p.dataResolucao)
+    .sort();
+  const firstDateStr = solvedDates.length > 0 ? solvedDates[0] : null;
+  const lastDateStr = solvedDates.length > 0 ? solvedDates[solvedDates.length - 1] : null;
+  
+  let totalWeeks = 1;
+  if (firstDateStr && lastDateStr) {
+    const d1 = new Date(firstDateStr);
+    const d2 = new Date(lastDateStr);
+    const diffDays = Math.max(1, Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 3600 * 24)));
+    totalWeeks = Math.max(1, Math.ceil(diffDays / 7));
+  }
+  const avgPerWeek = (totalSolved / totalWeeks).toFixed(1);
+
+  // Tópicos realmente estudados (com pelo menos 1 problema resolvido)
+  const topicsStudied = new Set(
+    problems.filter((p) => p.status === 'Resolvido').map((p) => p.topicId)
+  ).size;
 
   // Distribuição por área
   const areaDistribution = areas.map((area) => {
@@ -104,7 +125,10 @@ export const Statistics: React.FC = () => {
 
         <div className="col-span-2 sm:col-span-1 bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
           <span className="text-[11px] font-medium text-slate-400">Assuntos explorados</span>
-          <div className="text-2xl font-bold text-slate-900 mt-1">{topics.length}</div>
+          <div className="text-2xl font-bold text-slate-900 mt-1">
+            {topicsStudied}
+            <span className="text-xs font-normal text-slate-400 ml-1">/ {topics.length}</span>
+          </div>
         </div>
       </div>
 

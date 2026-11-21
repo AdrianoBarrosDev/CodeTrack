@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Star, Link2, Sparkles, Check } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { Problem, ProblemStatus } from '../types';
-import { sanitizeUrl } from '../utils/helpers';
+import { sanitizeUrl, getTodayISO } from '../utils/helpers';
 
 export const AddProblemModal: React.FC = () => {
   const {
@@ -20,7 +20,7 @@ export const AddProblemModal: React.FC = () => {
   const [selectedAreaId, setSelectedAreaId] = useState('');
   const [selectedTopicId, setSelectedTopicId] = useState('');
   const [dificuldade, setDificuldade] = useState('Médio');
-  const [dataResolucao, setDataResolucao] = useState('2026-11-21');
+  const [dataResolucao, setDataResolucao] = useState(getTodayISO);
   const [status, setStatus] = useState<ProblemStatus>('Resolvido');
   const [observacoes, setObservacoes] = useState('');
   
@@ -45,6 +45,7 @@ export const AddProblemModal: React.FC = () => {
       }
       setNome('');
       setUrl('');
+      setDataResolucao(getTodayISO());
       setObservacoes('');
       setIsStar(false);
       setConceitoPrincipal('');

@@ -1,5 +1,13 @@
 import { Problem } from '../types';
 
+export const getTodayISO = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const formatDatePtBR = (dateStr: string): string => {
   if (!dateStr) return '';
   const [year, month, day] = dateStr.split('-');
@@ -15,8 +23,21 @@ export const formatDatePtBR = (dateStr: string): string => {
 };
 
 export const getFullCurrentDatePtBR = (): string => {
-  // Conforme o cabeçalho do mockup: "Sábado, 21 de novembro de 2026"
-  return 'Sábado, 21 de novembro de 2026';
+  const now = new Date();
+  const daysOfWeek = [
+    'Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira',
+    'Quinta-feira', 'Sexta-feira', 'Sábado'
+  ];
+  const months = [
+    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+  ];
+  const dayName = daysOfWeek[now.getDay()];
+  const dayNum = now.getDate();
+  const monthName = months[now.getMonth()];
+  const year = now.getFullYear();
+
+  return `${dayName}, ${dayNum} de ${monthName} de ${year}`;
 };
 
 export type ReviewStatusCategory = 'pendente' | 'hoje' | 'em_breve' | 'nunca' | 'em_dia';
@@ -30,7 +51,7 @@ export const getReviewStatus = (problem: Problem): { label: string; type: Review
     return { label: 'Nunca revisado', type: 'nunca', colorClass: 'text-slate-600 bg-slate-100' };
   }
 
-  const todayStr = '2026-11-21'; // Data de referência da aplicação
+  const todayStr = getTodayISO();
   const nextRev = problem.proximaRevisao || '';
 
   if (nextRev < todayStr) {
@@ -45,19 +66,25 @@ export const getReviewStatus = (problem: Problem): { label: string; type: Review
   return { label: `Revisar em ${formatDatePtBR(nextRev)}`, type: 'em_breve', colorClass: 'text-indigo-700 bg-indigo-50 border border-indigo-200' };
 };
 
-export const calculateMaxReviewDate = (fromDateStr: string = '2026-11-21'): string => {
+export const calculateMaxReviewDate = (fromDateStr: string = getTodayISO()): string => {
   const parts = fromDateStr.split('-');
-  const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
   // Adiciona 60 dias (2 meses)
   date.setDate(date.getDate() + 60);
-  return date.toISOString().split('T')[0];
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 export const addDaysToDate = (fromDateStr: string, days: number): string => {
   const parts = fromDateStr.split('-');
-  const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
   date.setDate(date.getDate() + days);
-  return date.toISOString().split('T')[0];
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 export const sanitizeUrl = (url?: string): string => {
@@ -76,4 +103,3 @@ export const sanitizeUrl = (url?: string): string => {
   }
   return '#';
 };
-

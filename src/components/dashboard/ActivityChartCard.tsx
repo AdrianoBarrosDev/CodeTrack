@@ -1,28 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { TrendingUp } from 'lucide-react';
+import { useApp } from '../../contexts/AppContext';
 
 export const ActivityChartCard: React.FC = () => {
+  const { problems } = useApp();
   const [viewMode, setViewMode] = useState<'Semana' | 'Mês'>('Semana');
 
-  const weekData = [
-    { day: 'Seg', problemas: 1 },
-    { day: 'Ter', problemas: 2 },
-    { day: 'Qua', problemas: 1 },
-    { day: 'Qui', problemas: 0 },
-    { day: 'Sex', problemas: 2 },
-    { day: 'Sáb', problemas: 2 },
-    { day: 'Dom', problemas: 0 },
-  ];
+  // Determinar data base (usando a data atual ou a mais recente dos problemas)
+  const baseDate = useMemo(() => {
+    const solvedDates = problems
+      .filter((p) => p.status === 'Resolvido' && p.dataResolucao)
+      .map((p) => p.dataResolucao)
+      .sort();
+    const latestProblemDate = solvedDates.length > 0 ? solvedDates[solvedDates.length - 1] : null;
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
 
-  const monthData = [
-    { day: 'Sem 1', problemas: 8 },
-    { day: 'Sem 2', problemas: 11 },
-    { day: 'Sem 3', problemas: 9 },
-    { day: 'Sem 4', problemas: 12 },
-  ];
+    // Se a data mais recente cadastrada for mais nova (ex: ambiente simulado em 2026), respeita essa data
+    const refStr = latestProblemDate && latestProblemDate > todayStr ? latestProblemDate : todayStr;
+    const [y, m, d] = refStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }, [problems]);
+
+  // Dados da semana atual (Segunda a Domingo)
+  const { weekData, weekTotal, weekActiveDays } = useMemo(() => {
+    // Achar a segunda-feira da semana da baseDate
+    const current = new Date(baseDate);
+    const dayOfWeek = current.getDay(); // 0 = Dom, 1 = Seg, ...
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const monday = new Date(current);
+    monday.setDate(current.getDate() + diffToMonday);
+
+    const daysLabels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+    const data: { day: string; date: string; problemas: number }[] = [];
+
+    let total = 0;
+    let activeDays = 0;
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      const dateStr = d.toISOString().split('T')[0];
+
+      const count = problems.filter(
+        (p) => p.status === 'Resolvido' && p.dataResolucao === dateStr
+      ).length;
+
+      data.push({
+        day: daysLabels[i],
+        date: dateStr,
+        problemas: count,
+      });
+
+      total += count;
+      if (count > 0) activeDays++;
+    }
+
+    return { weekData: data, weekTotal: total, weekActiveDays: activeDays };
+  }, [problems, baseDate]);
+
+  // Dados das últimas 4 semanas para o Mês
+  const { monthData, monthTotal, monthActiveDays } = useMemo(() => {
+    const data: { day: string; problemas: number }[] = [];
+    let total = 0;
+    let activeDaysCount = 0;
+
+    for (let w = 3; w >= 0; w--) {
+      let weekCount = 0;
+      for (let d = 0; d < 7; d++) {
+        const dateObj = new Date(baseDate);
+        dateObj.setDate(baseDate.getDate() - (w * 7 + (6 - d)));
+        const dateStr = dateObj.toISOString().split('T')[0];
+
+        const count = problems.filter(
+          (p) => p.status === 'Resolvido' && p.dataResolucao === dateStr
+        ).length;
+
+        weekCount += count;
+        if (count > 0) activeDaysCount++;
+      }
+      data.push({
+        day: `Sem ${4 - w}`,
+        problemas: weekCount,
+      });
+      total += weekCount;
+    }
+
+    return { monthData: data, monthTotal: total, monthActiveDays: activeDaysCount };
+  }, [problems, baseDate]);
 
   const currentData = viewMode === 'Semana' ? weekData : monthData;
+  const currentTotal = viewMode === 'Semana' ? weekTotal : monthTotal;
+  const currentActiveDays = viewMode === 'Semana' ? weekActiveDays : monthActiveDays;
 
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
@@ -84,7 +154,7 @@ export const ActivityChartCard: React.FC = () => {
                   fontSize: '12px',
                   boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)',
                 }}
-                formatter={(value: any) => [`${value} problemas`, 'Resolvidos']}
+                formatter={(value: any) => [`${value} problema${Number(value) !== 1 ? 's' : ''}`, 'Resolvidos']}
               />
               <Bar dataKey="problemas" fill="#4F46E5" radius={[6, 6, 0, 0]} maxBarSize={32} />
             </BarChart>
@@ -92,13 +162,16 @@ export const ActivityChartCard: React.FC = () => {
         </div>
       </div>
 
-      {/* Footer Stats */}
+      {/* Footer Stats Dinâmicos */}
       <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs mt-3">
         <span className="font-semibold text-slate-800">
-          8 problemas <span className="font-normal text-slate-400">nesta semana</span>
+          {currentTotal} problema{currentTotal !== 1 ? 's' : ''}{' '}
+          <span className="font-normal text-slate-400">
+            {viewMode === 'Semana' ? 'nesta semana' : 'nas últimas 4 semanas'}
+          </span>
         </span>
         <span className="font-semibold text-emerald-600 flex items-center gap-1">
-          <TrendingUp className="w-3.5 h-3.5" /> 5 dias de estudo
+          <TrendingUp className="w-3.5 h-3.5" /> {currentActiveDays} dia{currentActiveDays !== 1 ? 's' : ''} de estudo
         </span>
       </div>
     </div>

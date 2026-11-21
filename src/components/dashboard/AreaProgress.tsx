@@ -19,16 +19,7 @@ export const AreaProgress: React.FC = () => {
     }
   };
 
-  // Metas de referência por área para calcular o percentual do mockup
-  const areaTargetMeta: Record<string, number> = {
-    area_ed: 50,
-    area_grafos: 40,
-    area_dp: 40,
-    area_math: 30,
-    area_strings: 25,
-    area_geo: 20,
-  };
-
+  // Calcular progresso baseado na soma das metas dos tópicos da área
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
       <div>
@@ -48,13 +39,16 @@ export const AreaProgress: React.FC = () => {
         <div className="mt-5 space-y-4">
           {areas.map((area) => {
             // Achar todos os tópicos dessa área
-            const areaTopicIds = topics.filter((t) => t.areaId === area.id).map((t) => t.id);
+            const areaTopics = topics.filter((t) => t.areaId === area.id);
+            const areaTopicIds = areaTopics.map((t) => t.id);
             // Contar quantos problemas resolvidos estão nessa área
             const solvedCount = problems.filter(
               (p) => areaTopicIds.includes(p.topicId) && p.status === 'Resolvido'
             ).length;
 
-            const target = areaTargetMeta[area.id] || 40;
+            // Meta dinâmica: soma das metas dos tópicos cadastrados nessa área
+            const topicsTarget = areaTopics.reduce((acc, t) => acc + (t.metaProblemas || 10), 0);
+            const target = topicsTarget > 0 ? topicsTarget : 20;
             const percentage = Math.min(100, Math.round((solvedCount / target) * 100));
 
             return (

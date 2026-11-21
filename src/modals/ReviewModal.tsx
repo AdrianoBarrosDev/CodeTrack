@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { X, Star, Calendar, CheckCircle, RotateCw, AlertCircle, Clock } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
 import { ReviewResult } from '../types';
-import { addDaysToDate, calculateMaxReviewDate } from '../utils/helpers';
+import { addDaysToDate, calculateMaxReviewDate, getTodayISO } from '../utils/helpers';
 
 export const ReviewModal: React.FC = () => {
   const { reviewModalProblem, closeReviewModal, recordReview, showToast } = useApp();
 
-  const [dataRevisao, setDataRevisao] = useState('2026-11-21');
+  const [dataRevisao, setDataRevisao] = useState(getTodayISO);
   const [resultado, setResultado] = useState<ReviewResult>('Lembrei completamente');
   const [observacoes, setObservacoes] = useState('');
   const [proximaRevisao, setProximaRevisao] = useState('');
@@ -16,11 +16,12 @@ export const ReviewModal: React.FC = () => {
 
   useEffect(() => {
     if (reviewModalProblem) {
-      setDataRevisao('2026-11-21');
+      const today = getTodayISO();
+      setDataRevisao(today);
       setResultado('Lembrei completamente');
       setObservacoes('');
       // Sugere por padrão 30 dias (1 mês) para a próxima revisão
-      setProximaRevisao(addDaysToDate('2026-11-21', 30));
+      setProximaRevisao(addDaysToDate(today, 30));
     }
   }, [reviewModalProblem]);
 

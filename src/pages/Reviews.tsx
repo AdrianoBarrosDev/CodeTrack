@@ -12,7 +12,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useApp } from '../contexts/AppContext';
-import { formatDatePtBR, getReviewStatus, sanitizeUrl } from '../utils/helpers';
+import { formatDatePtBR, getReviewStatus, sanitizeUrl, getTodayISO } from '../utils/helpers';
 import { Problem } from '../types';
 
 export const Reviews: React.FC = () => {
@@ -20,7 +20,7 @@ export const Reviews: React.FC = () => {
   const [activeSection, setActiveSection] = useState<'agora' | 'breve' | 'recentes' | 'historico'>('agora');
 
   const starProblems = problems.filter((p) => p.isStar);
-  const todayStr = '2026-11-21';
+  const todayStr = getTodayISO();
 
   // 1. Revisar agora (atrasados ou hoje)
   const reviewNow = starProblems.filter((p) => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Check, Star, BookOpen, Target, TrendingUp } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 
@@ -9,11 +9,39 @@ export const StatCards: React.FC = () => {
   const starCount = problems.filter((p) => p.isStar).length;
   
   // Tópicos que têm pelo menos 1 problema resolvido
-  const topicsStudied = new Set(
-    problems.filter((p) => p.status === 'Resolvido').map((p) => p.topicId)
-  ).size;
+  const topicsStudied = useMemo(() => {
+    return new Set(
+      problems.filter((p) => p.status === 'Resolvido').map((p) => p.topicId)
+    ).size;
+  }, [problems]);
 
-  const completionRate = Math.round((totalSolved / user.metaGlobal) * 100);
+  // Variação real dos últimos 3 dias
+  const solvedLast3Days = useMemo(() => {
+    const solvedDates = problems
+      .filter((p) => p.status === 'Resolvido' && p.dataResolucao)
+      .map((p) => p.dataResolucao)
+      .sort();
+    const latestProblemDate = solvedDates.length > 0 ? solvedDates[solvedDates.length - 1] : null;
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const refStr = latestProblemDate && latestProblemDate > todayStr ? latestProblemDate : todayStr;
+    const [y, m, d] = refStr.split('-').map(Number);
+    const refDate = new Date(y, m - 1, d);
+
+    const targetDates: string[] = [];
+    for (let i = 0; i < 3; i++) {
+      const dayObj = new Date(refDate);
+      dayObj.setDate(refDate.getDate() - i);
+      targetDates.push(dayObj.toISOString().split('T')[0]);
+    }
+
+    return problems.filter(
+      (p) => p.status === 'Resolvido' && targetDates.includes(p.dataResolucao)
+    ).length;
+  }, [problems]);
+
+  const userMeta = user.metaGlobal && user.metaGlobal > 0 ? user.metaGlobal : 100;
+  const completionRate = Math.min(100, Math.round((totalSolved / userMeta) * 100));
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -31,7 +59,7 @@ export const StatCards: React.FC = () => {
           </div>
           <div className="flex items-center gap-1.5 mt-1 text-[11px] font-semibold text-emerald-600">
             <TrendingUp className="w-3.5 h-3.5" />
-            <span>+6 nos últimos 3 dias</span>
+            <span>+{solvedLast3Days} nos últimos 3 dias</span>
           </div>
         </div>
       </div>
@@ -64,10 +92,10 @@ export const StatCards: React.FC = () => {
         </div>
         <div className="mt-3">
           <div className="text-2xl font-bold text-slate-900 tracking-tight">
-            {topicsStudied || topics.length}
+            {topicsStudied}
           </div>
           <div className="mt-1 text-[11px] text-slate-400">
-            Em {areas.length} áreas de conhecimento
+            De {topics.length} tópicos em {areas.length} áreas
           </div>
         </div>
       </div>
@@ -85,7 +113,7 @@ export const StatCards: React.FC = () => {
             {completionRate}%
           </div>
           <div className="mt-1 text-[11px] text-slate-400">
-            {totalSolved} de {user.metaGlobal} problemas da meta
+            {totalSolved} de {userMeta} problemas da meta
           </div>
         </div>
       </div>
