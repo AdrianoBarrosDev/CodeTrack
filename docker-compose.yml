@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: codetrack-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/data:/app/data
+      - ./server/src:/app/src
+    environment:
+      - PORT=3001
+      - DB_PATH=/app/data/codetrack.sqlite
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: codetrack-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - VITE_BACKEND_URL=http://backend:3001
+    depends_on:
+      - backend

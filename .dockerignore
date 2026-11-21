@@ -1,0 +1,10 @@
+node_modules
+server/node_modules
+dist
+dist-ssr
+.git
+.gitignore
+server/data/*
+!server/data/.gitkeep
+/*.md
+!/README.md

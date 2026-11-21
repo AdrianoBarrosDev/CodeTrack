@@ -1,0 +1,48 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Dependências
+node_modules
+server/node_modules
+
+# Build outputs
+dist
+dist-ssr
+*.local
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Banco de dados e arquivos locais do SQLite
+*.sqlite
+*.sqlite*
+*.sqlite-wal
+*.sqlite-shm
+*.db
+*.db*
+server/data/*
+!server/data/.gitkeep
+
+# Arquivos .md na raiz (exceto README.md)
+/*.md
+!/README.md
+
+# Arquivos de sistema e IDE
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
