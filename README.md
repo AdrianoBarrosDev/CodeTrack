@@ -47,13 +47,18 @@ docker compose down
 
 ### Modo 2: Sem Docker (Execução Local via Node.js)
 
-Você pode subir tudo com um único comando na raiz:
+1. **Instalar todas as dependências (Frontend + Backend):**
+   ```bash
+   npm install
+   ```
+   *(O script `postinstall` configurado já instala automaticamente as dependências da pasta `server`, ou você pode rodar explicitamente `npm run install:all`)*
 
-```bash
-npm run dev:all
-```
+2. **Subir tudo junto:**
+   ```bash
+   npm run dev:all
+   ```
 
-Ou subir separadamente em dois terminais:
+Ou, se preferir subir separadamente em dois terminais:
 
 1. **Terminal 1 (Backend):**
    ```bash
