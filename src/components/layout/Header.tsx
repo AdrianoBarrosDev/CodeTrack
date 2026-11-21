@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, Bell, Menu } from 'lucide-react';
+import { Search, Bell, Menu, Sun, Moon } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 
 interface HeaderProps {
@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const location = useLocation();
-  const { openSearch, user } = useApp();
+  const { openSearch, user, theme, toggleTheme } = useApp();
 
   const getPageTitle = (path: string): string => {
     if (path === '/') return 'Visão geral';
@@ -68,6 +68,20 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200/60">
           Demonstração
         </span>
+
+        {/* Toggle Dark / Light Mode */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors flex items-center justify-center cursor-pointer"
+          title={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+          aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400 stroke-[2.2]" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-500 stroke-[2.2]" />
+          )}
+        </button>
 
         {/* Notification Bell */}
         <button

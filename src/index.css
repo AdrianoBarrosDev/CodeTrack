@@ -2,14 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: light;
+  --bg-page: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+  --bg-hover: #F8FAFC;
+  --border-main: #E2E8F0;
+  --border-subtle: #F1F5F9;
+  --text-main: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-hover: #94A3B8;
+}
+
+.dark {
+  color-scheme: dark;
+  /* Paleta neutra baseada na referência de imagem: cinza escuro/antracite (#1E1E1E) e fundo profundo (#141414) */
+  --bg-page: #141414;
+  --bg-card: #1E1E1E;
+  --bg-subtle: #282828;
+  --bg-hover: #303030;
+  --border-main: #333333;
+  --border-subtle: #252525;
+  --text-main: #F5F5F5;
+  --text-secondary: #CCCCCC;
+  --text-muted: #888888;
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
+  --scrollbar-thumb: #333333;
+  --scrollbar-hover: #484848;
+}
+
 @layer base {
   body {
-    @apply bg-background-alt text-text-main antialiased min-h-screen selection:bg-brand-100 selection:text-brand-900;
+    background-color: var(--bg-page);
+    color: var(--text-main);
+    @apply antialiased min-h-screen selection:bg-brand-500/20 selection:text-brand-300;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar com suporte ao Dark Mode */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -18,9 +54,247 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: var(--scrollbar-thumb);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: var(--scrollbar-hover);
+}
+
+/* Regras semânticas para conversão harmoniosa em Dark Mode */
+.dark {
+  /* Fundo dos cartões, sidebars, headers e modais */
+  .bg-white {
+    background-color: var(--bg-card) !important;
+  }
+  .bg-slate-50 {
+    background-color: var(--bg-subtle) !important;
+  }
+  .bg-slate-100 {
+    background-color: var(--bg-subtle) !important;
+  }
+  .hover\:bg-slate-50:hover,
+  .hover\:bg-slate-50\/50:hover,
+  .hover\:bg-slate-50\/70:hover {
+    background-color: var(--bg-hover) !important;
+  }
+  .hover\:bg-slate-100:hover,
+  .hover\:bg-slate-100\/80:hover {
+    background-color: var(--bg-hover) !important;
+  }
+
+  /* Bordas */
+  .border-slate-100,
+  .border-slate-100\/50,
+  .border-slate-100\/80 {
+    border-color: var(--border-subtle) !important;
+  }
+  .border-slate-200,
+  .border-slate-200\/60,
+  .border-slate-200\/80 {
+    border-color: var(--border-main) !important;
+  }
+  .hover\:border-slate-200:hover,
+  .hover\:border-slate-300:hover {
+    border-color: #384A63 !important;
+  }
+  .divide-slate-50 > :not([hidden]) ~ :not([hidden]),
+  .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--border-subtle) !important;
+  }
+
+  /* Textos */
+  .text-slate-900 {
+    color: var(--text-main) !important;
+  }
+  .text-slate-800 {
+    color: #E2E8F0 !important;
+  }
+  .text-slate-700 {
+    color: var(--text-secondary) !important;
+  }
+  .text-slate-600 {
+    color: var(--text-secondary) !important;
+  }
+  .text-slate-500 {
+    color: var(--text-muted) !important;
+  }
+  .text-slate-400 {
+    color: var(--text-muted) !important;
+  }
+  .hover\:text-slate-900:hover,
+  .hover\:text-slate-800:hover {
+    color: #FFFFFF !important;
+  }
+
+  /* Badges de Cores com contraste otimizado para o Dark Mode */
+  .bg-emerald-50,
+  .bg-emerald-50\/70 {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #34D399 !important;
+  }
+  .border-emerald-100,
+  .border-emerald-200 {
+    border-color: rgba(16, 185, 129, 0.3) !important;
+  }
+  .text-emerald-700,
+  .text-emerald-600 {
+    color: #34D399 !important;
+  }
+
+  .bg-amber-50,
+  .bg-amber-50\/70 {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+    color: #FBBF24 !important;
+  }
+  .bg-amber-100 {
+    background-color: rgba(245, 158, 11, 0.20) !important;
+    color: #FBBF24 !important;
+  }
+  .border-amber-100,
+  .border-amber-200,
+  .border-amber-200\/80 {
+    border-color: rgba(245, 158, 11, 0.3) !important;
+  }
+  .text-amber-800,
+  .text-amber-700,
+  .text-amber-900 {
+    color: #FBBF24 !important;
+  }
+
+  .bg-rose-50,
+  .bg-rose-50\/50,
+  .bg-rose-50\/30 {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    color: #F87171 !important;
+  }
+  .border-rose-100,
+  .border-rose-200 {
+    border-color: rgba(239, 68, 68, 0.3) !important;
+  }
+  .text-rose-700,
+  .text-rose-600,
+  .text-rose-900 {
+    color: #F87171 !important;
+  }
+
+  .bg-sky-50 {
+    background-color: rgba(2, 132, 199, 0.15) !important;
+    color: #38BDF8 !important;
+  }
+  .text-sky-600 {
+    color: #38BDF8 !important;
+  }
+
+  .bg-indigo-50,
+  .bg-brand-50,
+  .bg-brand-50\/70,
+  .bg-brand-50\/60 {
+    background-color: rgba(99, 102, 241, 0.16) !important;
+    color: #A5B4FC !important;
+  }
+  .border-brand-100,
+  .border-brand-200 {
+    border-color: rgba(99, 102, 241, 0.3) !important;
+  }
+  .text-brand-700,
+  .text-brand-600 {
+    color: #A5B4FC !important;
+  }
+
+  /* Inputs, Textareas e Selects no Dark Mode */
+  input, select, textarea {
+    background-color: var(--bg-subtle) !important;
+    color: var(--text-main) !important;
+    border-color: var(--border-main) !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--text-muted) !important;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: #818CF8 !important;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25) !important;
+  }
+
+  /* Sombras adaptadas para fundo escuro */
+  .shadow-xs, .shadow-sm, .shadow-2xs {
+    box-shadow: var(--card-shadow) !important;
+  }
+
+  /* Células vazias do Heatmap no Dark Mode */
+  .bg-slate-100\/70 {
+    background-color: #242424 !important;
+  }
+  .bg-slate-100\/70:hover {
+    background-color: #333333 !important;
+  }
+
+  /* Tecla de atalho KBD */
+  kbd {
+    background-color: #262626 !important;
+    border-color: #383838 !important;
+    color: #A3A3A3 !important;
+  }
+
+  /* Gráficos Recharts no Dark Mode */
+  .recharts-cartesian-grid line {
+    stroke: var(--border-subtle) !important;
+  }
+  .recharts-text text,
+  .recharts-text tspan {
+    fill: var(--text-muted) !important;
+  }
+
+  /* Card Motivacional na Sidebar */
+  .from-indigo-50\/70 {
+    --tw-gradient-from: rgba(79, 70, 229, 0.12) !important;
+  }
+  .to-blue-50\/50 {
+    --tw-gradient-to: rgba(2, 132, 199, 0.08) !important;
+  }
+  .border-indigo-100\/80 {
+    border-color: rgba(99, 102, 241, 0.25) !important;
+  }
+
+  /* Modal Overlays */
+  .bg-slate-900\/40 {
+    background-color: rgba(0, 0, 0, 0.65) !important;
+  }
+
+  /* Cabeçalhos sticky de modais e headers com opacidade */
+  .bg-white\/95 {
+    background-color: rgba(30, 30, 30, 0.95) !important;
+  }
+
+  /* Fundos de seção com variantes de opacidade (Meus Assuntos, etc.) */
+  .bg-slate-50\/40 {
+    background-color: rgba(40, 40, 40, 0.6) !important;
+  }
+  .bg-slate-50\/50 {
+    background-color: rgba(40, 40, 40, 0.7) !important;
+  }
+
+  /* Variantes de amber com opacidade (Problema Estrela, revisão) */
+  .bg-amber-50\/60 {
+    background-color: rgba(245, 158, 11, 0.12) !important;
+  }
+  .bg-amber-50\/50 {
+    background-color: rgba(245, 158, 11, 0.10) !important;
+  }
+  .bg-amber-50\/40 {
+    background-color: rgba(245, 158, 11, 0.08) !important;
+  }
+  .bg-amber-100\/60 {
+    background-color: rgba(245, 158, 11, 0.20) !important;
+  }
+
+  /* Variantes de brand com opacidade */
+  .bg-brand-50\/50 {
+    background-color: rgba(99, 102, 241, 0.12) !important;
+  }
+
+  /* Hover em variantes com opacidade */
+  .hover\:bg-slate-100\/50:hover {
+    background-color: var(--bg-hover) !important;
+  }
 }

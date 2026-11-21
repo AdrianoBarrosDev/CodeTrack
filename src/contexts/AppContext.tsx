@@ -63,6 +63,11 @@ interface AppContextType {
   // Notificações Toast
   toasts: Toast[];
   showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+
+  // Tema Dark / Light
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -100,6 +105,39 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [selectedTopicForNewProblem, setSelectedTopicForNewProblem] = useState<string | undefined>();
   const [reviewModalProblem, setReviewModalProblem] = useState<Problem | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Tema Dark / Light
+  const [theme, setThemeState] = useState<'light' | 'dark'>(() => {
+    try {
+      const saved = localStorage.getItem('codetrack_theme');
+      if (saved === 'light' || saved === 'dark') return saved;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  const setTheme = (newTheme: 'light' | 'dark') => {
+    setThemeState(newTheme);
+    try {
+      localStorage.setItem('codetrack_theme', newTheme);
+    } catch (e) {
+      console.warn('Erro ao salvar tema:', e);
+    }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
 
   // Toasts
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -424,6 +462,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         closeSearch,
         toasts,
         showToast,
+        theme,
+        setTheme,
+        toggleTheme,
       }}
     >
       {children}
