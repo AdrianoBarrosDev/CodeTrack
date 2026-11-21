@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { ToastContainer } from '../ui/Toast';
@@ -9,11 +9,18 @@ import { GlobalSearchModal } from '../../modals/GlobalSearchModal';
 
 export const Layout: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { pathname } = useLocation();
+
+  // Rola automaticamente para o topo ao trocar de rota e fecha menu mobile
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   return (
     <div className="flex min-h-screen bg-background-alt text-text-main font-sans">
-      {/* Sidebar Desktop */}
-      <div className="hidden lg:block">
+      {/* Sidebar Desktop Placeholder & Container */}
+      <div className="hidden lg:block w-64 shrink-0">
         <Sidebar />
       </div>
 
@@ -25,7 +32,7 @@ export const Layout: React.FC = () => {
             onClick={() => setMobileMenuOpen(false)}
           />
           <div className="relative z-50 w-64 h-full bg-white shadow-xl animate-in slide-in-from-left duration-200">
-            <Sidebar />
+            <Sidebar isMobile />
           </div>
         </div>
       )}

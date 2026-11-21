@@ -127,42 +127,42 @@ export const GlobalSearchModal: React.FC = () => {
                       return (
                         <div
                           key={p.id}
-                          className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 border border-slate-100 transition-colors"
+                          className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 p-3 rounded-xl hover:bg-slate-50 border border-slate-100 transition-colors"
                         >
-                          <div className="flex items-center gap-2.5">
+                          <div className="flex items-start sm:items-center gap-2.5 min-w-0">
                             {p.isStar ? (
-                              <Star className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0" />
+                              <Star className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0 mt-0.5 sm:mt-0" />
                             ) : (
-                              <div className="w-2 h-2 rounded-full bg-slate-300 ml-1 mr-1" />
+                              <div className="w-2 h-2 rounded-full bg-slate-300 ml-1 mr-1 shrink-0 mt-1.5 sm:mt-0" />
                             )}
-                            <div>
-                              <div className="text-xs font-semibold text-slate-800 flex items-center gap-2">
-                                <span>{p.nome}</span>
-                                <span className="text-[10px] px-1.5 py-0.2 bg-slate-100 text-slate-600 rounded">
+                            <div className="min-w-0">
+                              <div className="text-xs font-semibold text-slate-800 flex flex-wrap items-center gap-2">
+                                <span className="truncate">{p.nome}</span>
+                                <span className="text-[10px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded font-medium shrink-0">
                                   {p.plataforma}
                                 </span>
                               </div>
-                              <div className="text-[11px] text-slate-400">
+                              <div className="text-[11px] text-slate-400 mt-0.5">
                                 {topic?.nome} {p.dificuldade ? `· ${p.dificuldade}` : ''}
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 lg:border-t-0 lg:pt-0 justify-start lg:justify-end shrink-0">
                             {p.isStar && (
                               <button
                                 onClick={() => {
                                   closeSearch();
                                   openReviewModal(p);
                                 }}
-                                className="px-2 py-1 text-[11px] font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors"
+                                className="px-2.5 py-1.5 text-[11px] font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/60 rounded-lg transition-colors flex items-center gap-1"
                               >
                                 Revisar
                               </button>
                             )}
                             <button
                               onClick={() => handleOpenProblemLink(p.url)}
-                              className="px-2.5 py-1 text-[11px] font-medium text-brand-600 hover:bg-brand-50 rounded-lg transition-colors flex items-center gap-1"
+                              className="px-3 py-1.5 text-[11px] font-semibold text-brand-600 hover:text-brand-700 bg-brand-50/60 hover:bg-brand-50 border border-brand-100/60 rounded-lg transition-colors flex items-center gap-1"
                             >
                               Ver enunciado
                             </button>

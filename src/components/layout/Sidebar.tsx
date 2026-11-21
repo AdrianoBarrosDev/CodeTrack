@@ -14,7 +14,11 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isMobile?: boolean;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ isMobile = false }) => {
   const { user, problems } = useApp();
   const starCount = problems.filter((p) => p.isStar).length;
 
@@ -35,10 +39,14 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between h-screen sticky top-0 shrink-0 select-none z-20">
-      <div className="flex flex-col">
+    <aside
+      className={`w-64 bg-white border-r border-slate-200 flex flex-col justify-between select-none z-20 ${
+        isMobile ? 'h-full w-full' : 'h-screen fixed left-0 top-0 bottom-0'
+      }`}
+    >
+      <div className="flex flex-col flex-1 overflow-y-auto">
         {/* Logo Header */}
-        <div className="h-16 flex items-center gap-3 px-6 border-b border-slate-100">
+        <div className="h-16 flex items-center gap-3 px-6 border-b border-slate-100 shrink-0">
           <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-sm shadow-brand-500/30">
             <Code2 className="w-5 h-5 stroke-[2.5]" />
           </div>
@@ -48,7 +56,7 @@ export const Sidebar: React.FC = () => {
         </div>
 
         {/* Navigation Category Label */}
-        <div className="px-6 pt-6 pb-2">
+        <div className="px-6 pt-6 pb-2 shrink-0">
           <p className="text-[11px] font-semibold text-slate-400 tracking-wider uppercase">
             Seu espaço de estudos
           </p>
@@ -97,7 +105,7 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Footer Area: Motivational Card & User Profile */}
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 shrink-0">
         {/* Motivational Card */}
         <div className="p-3.5 rounded-xl bg-gradient-to-br from-indigo-50/70 to-blue-50/50 border border-indigo-100/80">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-brand-700 mb-1">

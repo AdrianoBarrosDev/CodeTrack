@@ -41,10 +41,19 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Search Bar with shortcut */}
+        {/* Botão de busca compacto (Ícone de lupa quando o menu vira sanduíche < lg) */}
         <button
           onClick={openSearch}
-          className="flex items-center gap-2.5 px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-xl text-xs text-slate-400 hover:text-slate-600 transition-all w-60 sm:w-72 justify-between"
+          className="p-2 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-slate-200/80 transition-colors lg:hidden flex items-center justify-center"
+          aria-label="Buscar problemas e assuntos"
+        >
+          <Search className="w-4 h-4 text-slate-500" />
+        </button>
+
+        {/* Barra de busca expandida com atalho (Desktop quando a sidebar está visível >= lg) */}
+        <button
+          onClick={openSearch}
+          className="hidden lg:flex items-center gap-2.5 px-3.5 py-1.5 bg-slate-50 hover:bg-slate-100/80 border border-slate-200/80 rounded-xl text-xs text-slate-400 hover:text-slate-600 transition-all w-60 sm:w-72 justify-between"
         >
           <div className="flex items-center gap-2">
             <Search className="w-3.5 h-3.5 text-slate-400" />
